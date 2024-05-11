@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::fmt;
 use itertools::Itertools;
 
@@ -34,21 +35,21 @@ impl GameBoard {
             .collect()
     }
 
-    pub fn find_possible_sequences(&self) -> Vec<String> {
+    pub fn find_possible_sequences(&self, word_set: &HashSet<String>) -> Vec<String> {
         let visited = [[false; 4]; 4];
 
         let mut found = vec![];
 
         for r in 0..4 {
             for c in 0..4 {
-                self.find_possible_sequences_recurse(r, c, String::new(), visited, &mut found);
+                self.find_possible_sequences_recurse(r, c, String::new(), visited, &mut found, word_set);
             }
         }
 
         found
     }
 
-    fn find_possible_sequences_recurse(&self, row: i8, col: i8, mut word: String, mut visited: [[bool; 4]; 4], found: &mut Vec<String>) {
+    fn find_possible_sequences_recurse(&self, row: i8, col: i8, mut word: String, mut visited: [[bool; 4]; 4], found: &mut Vec<String>, word_set: &HashSet<String>) {
         let valid_idx = 0..4i8;
 
         if !valid_idx.contains(&row) && !valid_idx.contains(&row) || visited[row as usize][col as usize] {
@@ -67,13 +68,15 @@ impl GameBoard {
             .collect::<Vec<_>>();
 
         // println!("{}", word);
-        found.push(word.clone());
+        if word_set.contains(&word) {
+            found.push(word.clone());
+        }
 
         for (&x, y) in move_set {
             let (c, r) = (x + col, y + row);
 
             if valid_idx.contains(&c) && valid_idx.contains(&r) && !visited[r as usize][c as usize] {
-                self.find_possible_sequences_recurse(r, c, word.clone(), visited, found);
+                self.find_possible_sequences_recurse(r, c, word.clone(), visited, found, word_set);
             }
         }
     }

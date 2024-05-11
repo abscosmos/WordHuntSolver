@@ -18,24 +18,11 @@ fn main() {
     println!("Potential words: {}", list.words().len());
 
     let start = std::time::Instant::now();
-
-    let sequences = board.find_possible_sequences();
+    let words = board.find_possible_sequences(list.words());
     let fin = std::time::Instant::now() - start;
 
+    words.iter()
+        .for_each(|w| println!("{w}"));
 
-    let start2 = std::time::Instant::now();
-
-    let real_words: Vec<String> = sequences.clone()
-        .into_iter()
-        .filter(|w| list.words().contains(w))
-        .sorted_by(|a, b| b.len().cmp(&a.len()))
-        .collect();
-    let fin2 = std::time::Instant::now() - start2;
-
-    for word in &real_words {
-        println!("{word}");
-    }
-
-    println!("{} total, {} sec, {}real", sequences.len(), fin.as_secs(), real_words.len());
-    println!("{} sec filter", fin2.as_secs());
+    println!("{} found, {} sec", words.len(), fin.as_secs());
 }

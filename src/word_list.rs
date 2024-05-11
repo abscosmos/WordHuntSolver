@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 
+#[derive(Clone)]
 pub struct WordList(HashSet<String>);
 
 impl WordList {
@@ -13,23 +14,21 @@ impl WordList {
     }
 
     pub fn from_vec(words: Vec<String>) -> Self {
-        Self(HashSet::from_iter(words.into_iter()))
+        Self(words.into_iter().collect())
     }
 
     pub fn words(&self) -> &HashSet<String> {
         &self.0
     }
 
-    pub fn words_mut(&mut self) -> &mut HashSet<String> {
-        &mut self.0
+    pub fn validate_words(&mut self) {
+        self.0
+            .retain(|word| (3..=14).contains(&word.len()) && word.chars().all(|c| c.is_ascii_alphabetic()));
+        self.0 = self.0
+            .iter()
+            .map(|w| w.to_ascii_lowercase())
+            .collect();
     }
-
-    // pub fn validate_words(&mut self) {
-    //     self.0
-    //         .retain(|word| (3..=14).contains(&word.len()) && word.chars().all(|c| c.is_ascii_alphabetic()));
-    //     self.0.iter()
-    //         .for_each(|s| { *s = s.to_ascii_lowercase(); });
-    // }
 
     pub fn retain_only_possible(&mut self, letters: &Vec<char>) {
         self.0
