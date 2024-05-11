@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+use itertools::Itertools;
 use trie_rs::{Trie, TrieBuilder};
 
 #[derive(Clone)]
@@ -34,6 +35,7 @@ impl WordList {
     pub fn into_trie(self) -> Trie<u8> {
         let mut builder = TrieBuilder::new();
         self.0.into_iter()
+            .sorted()
             .for_each(|w| builder.push(w));
         builder.build()
     }
