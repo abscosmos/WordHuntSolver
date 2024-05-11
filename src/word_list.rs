@@ -1,4 +1,6 @@
-pub struct WordList(Vec<String>);
+use std::collections::HashSet;
+
+pub struct WordList(HashSet<String>);
 
 impl WordList {
     pub fn load_from_file(path: &std::path::Path) -> std::io::Result<Self> {
@@ -11,23 +13,23 @@ impl WordList {
     }
 
     pub fn from_vec(words: Vec<String>) -> Self {
-        Self(words)
+        Self(HashSet::from_iter(words.into_iter()))
     }
 
-    pub fn words(&self) -> &Vec<String> {
+    pub fn words(&self) -> &HashSet<String> {
         &self.0
     }
 
-    pub fn words_mut(&mut self) -> &mut Vec<String> {
+    pub fn words_mut(&mut self) -> &mut HashSet<String> {
         &mut self.0
     }
 
-    pub fn validate_words(&mut self) {
-        self.0
-            .retain(|word| (3..=14).contains(&word.len()) && word.chars().all(|c| c.is_ascii_alphabetic()));
-        self.0.iter_mut()
-            .for_each(|s| { *s = s.to_ascii_lowercase(); });
-    }
+    // pub fn validate_words(&mut self) {
+    //     self.0
+    //         .retain(|word| (3..=14).contains(&word.len()) && word.chars().all(|c| c.is_ascii_alphabetic()));
+    //     self.0.iter()
+    //         .for_each(|s| { *s = s.to_ascii_lowercase(); });
+    // }
 
     pub fn retain_only_possible(&mut self, letters: &Vec<char>) {
         self.0

@@ -41,12 +41,9 @@ impl GameBoard {
 
         for r in 0..4 {
             for c in 0..4 {
-                println!("started {}", self.0[r as usize][c as usize]);
                 self.find_possible_sequences_recurse(r, c, String::new(), visited, &mut found);
             }
         }
-
-        println!("done searching");
 
         found
     }
