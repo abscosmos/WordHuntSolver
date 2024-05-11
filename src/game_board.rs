@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 use std::fmt;
 use itertools::Itertools;
+use trie_rs::Trie;
 
 #[derive(Debug)]
 pub struct GameBoard([[char; 4]; 4]);
@@ -78,6 +79,52 @@ impl GameBoard {
             if valid_idx.contains(&c) && valid_idx.contains(&r) && !visited[r as usize][c as usize] {
                 self.find_possible_sequences_recurse(r, c, word.clone(), visited, found, word_set);
             }
+        }
+    }
+
+    pub fn find_possible_sequences_trie(&self, word_trie: &Trie<u8>) -> Vec<String> {
+        let visited = [[false; 4]; 4];
+
+        let mut found = vec![];
+
+        for r in 0..4 {
+            for c in 0..4 {
+                self.find_possible_sequences_recurse_trie(r, c, String::new(), visited, &mut found, word_trie);
+            }
+        }
+
+        found
+    }
+
+    fn find_possible_sequences_recurse_trie(&self, row: i8, col: i8, mut word: String, mut visited: [[bool; 4]; 4], found: &mut Vec<String>, word_trie: &Trie<u8>) {
+        let valid_idx = 0..4i8;
+
+        if !valid_idx.contains(&row) && !valid_idx.contains(&row) || visited[row as usize][col as usize] {
+            return;
+        }
+
+        visited[row as usize][col as usize] = true;
+
+        word.push(self.0[row as usize][col as usize]);
+        // check if word list has word
+
+        let move_set = [-1i8, 0, 1];
+        let move_set = move_set
+            .iter()
+            .cartesian_product(move_set)
+            .collect::<Vec<_>>();
+
+        if word_trie.is_prefix(&word) {
+            for (&x, y) in move_set {
+                let (c, r) = (x + col, y + row);
+                if valid_idx.contains(&c) && valid_idx.contains(&r) && !visited[r as usize][c as usize] {
+                    self.find_possible_sequences_recurse_trie(r, c, word.clone(), visited, found, word_trie);
+                }
+            }
+        }
+
+        if word_trie.exact_match(&word) {
+            found.push(word.clone());
         }
     }
 }

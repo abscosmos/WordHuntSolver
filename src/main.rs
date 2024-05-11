@@ -18,11 +18,16 @@ fn main() {
     println!("Potential words: {}", list.words().len());
 
     let start = std::time::Instant::now();
-    let words = board.find_possible_sequences(list.words());
+    // let mut words = board.find_possible_sequences(&list.words());
+    let mut words_trie = board.find_possible_sequences_trie(&list.into_trie());
     let fin = std::time::Instant::now() - start;
 
-    words.iter()
+
+
+    words_trie.iter()
+        .sorted_by_key(|w| (w.len(), *w))
+        .rev()
         .for_each(|w| println!("{w}"));
 
-    println!("{} found, {} sec", words.len(), fin.as_secs());
+    println!("{} found, {} sec", words_trie.len(), fin.as_secs());
 }

@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+use trie_rs::{Trie, TrieBuilder};
 
 #[derive(Clone)]
 pub struct WordList(HashSet<String>);
@@ -28,6 +29,13 @@ impl WordList {
             .iter()
             .map(|w| w.to_ascii_lowercase())
             .collect();
+    }
+
+    pub fn into_trie(self) -> Trie<u8> {
+        let mut builder = TrieBuilder::new();
+        self.0.into_iter()
+            .for_each(|w| builder.push(w));
+        builder.build()
     }
 
     pub fn retain_only_possible(&mut self, letters: &Vec<char>) {
