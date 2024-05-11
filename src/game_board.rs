@@ -20,6 +20,19 @@ impl GameBoard {
 
         Some(GameBoard(board))
     }
+
+    pub fn letters(&self) -> Vec<char> {
+        self.0.iter()
+            .flat_map(|row| row.iter().cloned())
+            .collect()
+    }
+
+    pub fn letters_distinct(&self) -> Vec<char> {
+        self.0.iter()
+            .flat_map(|row| row.iter().cloned())
+            .unique()
+            .collect()
+    }
 }
 
 impl fmt::Display for GameBoard {
