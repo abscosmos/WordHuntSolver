@@ -33,6 +33,53 @@ impl GameBoard {
             .unique()
             .collect()
     }
+
+    pub fn find_possible_sequences(&self) -> Vec<String> {
+        let visited = [[false; 4]; 4];
+
+        let mut found = vec![];
+
+        for r in 0..4 {
+            for c in 0..4 {
+                println!("started {}", self.0[r as usize][c as usize]);
+                self.find_possible_sequences_recurse(r, c, String::new(), visited, &mut found);
+            }
+        }
+
+        println!("done searching");
+
+        found
+    }
+
+    fn find_possible_sequences_recurse(&self, row: i8, col: i8, mut word: String, mut visited: [[bool; 4]; 4], found: &mut Vec<String>) {
+        let valid_idx = 0..4i8;
+
+        if !valid_idx.contains(&row) && !valid_idx.contains(&row) || visited[row as usize][col as usize] {
+            return;
+        }
+
+        visited[row as usize][col as usize] = true;
+
+        word.push(self.0[row as usize][col as usize]);
+        // check if word list has word
+
+        let move_set = [-1i8, 0, 1];
+        let move_set = move_set
+            .iter()
+            .cartesian_product(move_set)
+            .collect::<Vec<_>>();
+
+        // println!("{}", word);
+        found.push(word.clone());
+
+        for (&x, y) in move_set {
+            let (c, r) = (x + col, y + row);
+
+            if valid_idx.contains(&c) && valid_idx.contains(&r) && !visited[r as usize][c as usize] {
+                self.find_possible_sequences_recurse(r, c, word.clone(), visited, found);
+            }
+        }
+    }
 }
 
 impl fmt::Display for GameBoard {

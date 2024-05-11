@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use crate::game_board::GameBoard;
 use crate::word_list::WordList;
 
@@ -12,12 +13,27 @@ fn main() {
 
     println!("{board}");
 
-    let mut words = WordList::load_from_file("dictionary/compiled_words.txt".as_ref()).unwrap();
-    words.retain_only_possible(&board.letters_distinct());
+    let mut list = WordList::load_from_file("dictionary/compiled_words.txt".as_ref()).unwrap();
+    list.retain_only_possible(&board.letters_distinct());
 
-    println!("{}", words.words().len());
+    println!("{}", list.words().len());
 
-    for word in words.words().iter().step_by(100).take(100) {
-        println!("{word}");
-    }
+    let start = std::time::Instant::now();
+
+    let f = board.find_possible_sequences();
+    let fin = std::time::Instant::now() - start;
+
+    // for w in list.words().iter() {
+    //     if f.contains(w) {
+    //         println!("{}", w);
+    //         ct += 1;
+    //     } else {
+    //         nct += 1;
+    //         if (nct % 100) == 0 {
+    //             println!("{}", nct);
+    //         }
+    //     }
+    // }
+
+    println!("{} total, {} sec", f.len(), fin.as_secs());
 }
