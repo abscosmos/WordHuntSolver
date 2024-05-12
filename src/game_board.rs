@@ -1,4 +1,3 @@
-use std::collections::HashSet;
 use std::fmt;
 use itertools::Itertools;
 use trie_rs::Trie;
@@ -29,48 +28,42 @@ impl GameBoard {
             .collect()
     }
 
-    pub fn find_possible_sequences(&self, word_trie: &Trie<u8>) -> Vec<String> {
-        let visited = [[false; 4]; 4];
-
-        let mut found = vec![];
+    pub fn find_possible_sequences(&self, word_trie: &Trie<u8>) -> Vec<FoundWord> {
+        let mut found = Vec::new();
 
         for r in 0..4 {
             for c in 0..4 {
-                self.find_possible_sequences_recurse(r, c, String::new(), visited, &mut found, word_trie);
+                self.find_possible_sequences_recurse(r, c, String::new(), [[false; 4]; 4], &mut found, word_trie, Vec::new());
             }
         }
 
         found
     }
 
-    fn find_possible_sequences_recurse(&self, row: i8, col: i8, mut word: String, mut visited: [[bool; 4]; 4], found: &mut Vec<String>, word_trie: &Trie<u8>) {
-        let valid_idx = 0..4i8;
+    fn find_possible_sequences_recurse(&self, row: usize, col: usize, mut word: String, mut visited: [[bool; 4]; 4], found: &mut Vec<FoundWord>, word_trie: &Trie<u8>, mut path: Vec<u8>) {
+        let valid_idx = 0..4;
 
-        if !valid_idx.contains(&row) && !valid_idx.contains(&row) || visited[row as usize][col as usize] {
-            return;
-        }
+        visited[row][col] = true;
 
-        visited[row as usize][col as usize] = true;
-
-        word.push(self.0[row as usize][col as usize]);
+        word.push(self.0[row][col]);
+        path.push((row * 4 + col) as u8);
 
         let move_set = [-1i8, 0, 1];
         let move_set = move_set
             .iter()
-            .cartesian_product(move_set)
-            .collect::<Vec<_>>();
+            .cartesian_product(move_set);
 
         if word_trie.is_prefix(&word) {
-            for (&x, y) in move_set {
-                let (c, r) = (x + col, y + row);
-                if valid_idx.contains(&c) && valid_idx.contains(&r) && !visited[r as usize][c as usize] {
-                    self.find_possible_sequences_recurse(r, c, word.clone(), visited, found, word_trie);
+            for (&y, x) in move_set {
+                let (c, r) = ((x + col as i8) as usize, (y + row as i8) as usize);
+                if valid_idx.contains(&c) && valid_idx.contains(&r) && !visited[r][c] {
+                    self.find_possible_sequences_recurse(r, c, word.clone(), visited, found, word_trie, path.clone());
                 }
             }
         }
 
         if word_trie.exact_match(&word) {
-            found.push(word.clone());
+            found.push(FoundWord { word: word.clone(), path });
         }
     }
 }
@@ -84,4 +77,20 @@ impl fmt::Display for GameBoard {
     }
 }
 
-pub struct FoundWord(Vec<u8>);
+#[derive(Debug, Clone, PartialEq)]
+pub struct FoundWord {
+    pub word: String,
+    pub path: Vec<u8>
+}
+
+impl FoundWord {
+    pub fn from_slice(word: String, slice: &[u8; 16]) -> Self {
+        Self{
+            word,
+            path: slice.iter()
+                .filter(|&n| n != &16)
+                .cloned()
+                .collect()
+        }
+    }
+}

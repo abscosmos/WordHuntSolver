@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use crate::game_board::GameBoard;
+use crate::game_board::{FoundWord, GameBoard};
 use crate::word_list::WordList;
 
 mod game_board;
@@ -17,11 +17,10 @@ fn main() {
     let words_trie = board.find_possible_sequences(&list.into_trie());
 
     words_trie.iter()
-        .sorted_by_key(|w| (w.len(), *w))
+        .sorted_by_key(|FoundWord {word, .. }| (word.len(), word))
         .rev()
-        .for_each(|w| println!("{w}"));
+        .take(5)
+        .for_each(|w| println!("{w:?}"));
 
     println!("{}", words_trie.len());
-
-    profile::test();
 }
