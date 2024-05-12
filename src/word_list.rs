@@ -30,7 +30,7 @@ impl WordListBuilder {
     }
 
     pub fn only_using_letters(mut self, letters: &Vec<char>) -> Self {
-        let mut unique = letters.iter().unique().collect::<String>();
+        let unique = letters.iter().unique().collect::<String>();
 
         self.0
             .retain(|word| word.chars().all(|c| unique.contains(c)));

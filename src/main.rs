@@ -1,5 +1,4 @@
 use std::io;
-use std::io::Write;
 use itertools::Itertools;
 use crate::game_board::GameBoard;
 use crate::word_list::WordListBuilder;
@@ -9,7 +8,7 @@ mod word_list;
 mod found_word;
 
 fn main() {
-    let mut word_list = WordListBuilder::from_words(
+    let word_list = WordListBuilder::from_words(
         include_str!("../dictionary/CollinsScrabbleWords.txt")
             .lines()
     );

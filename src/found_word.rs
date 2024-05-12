@@ -9,16 +9,6 @@ pub struct FoundWord {
 }
 
 impl FoundWord {
-    pub fn from_slice(word: String, slice: &[u8; 16]) -> Self {
-        Self{
-            word,
-            path: slice.iter()
-                .filter(|&n| n != &16)
-                .cloned()
-                .collect()
-        }
-    }
-
     pub fn as_string_with_arrows(&self) -> String {
         let mut board = ['*'; 16];
         self.path
