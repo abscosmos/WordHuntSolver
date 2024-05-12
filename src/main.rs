@@ -4,6 +4,7 @@ use crate::word_list::WordList;
 
 mod game_board;
 mod word_list;
+mod found_word;
 
 fn main() {
     let board = "oatrihpshtnrenei";

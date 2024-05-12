@@ -1,7 +1,7 @@
-use std::cmp::Ordering;
 use std::fmt;
 use itertools::Itertools;
 use trie_rs::Trie;
+use crate::found_word::FoundWord;
 
 #[derive(Debug)]
 pub struct GameBoard([[char; 4]; 4]);
@@ -75,34 +75,5 @@ impl fmt::Display for GameBoard {
             .map(|row| row.iter().join(" "))
             .join("\n");
         write!(f, "{board}")
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Ord)]
-pub struct FoundWord {
-    pub word: String,
-    pub path: Vec<u8>
-}
-
-impl FoundWord {
-    pub fn from_slice(word: String, slice: &[u8; 16]) -> Self {
-        Self{
-            word,
-            path: slice.iter()
-                .filter(|&n| n != &16)
-                .cloned()
-                .collect()
-        }
-    }
-}
-
-impl PartialOrd for FoundWord {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(
-            match self.word.len().cmp(&other.word.len()) {
-                Ordering::Equal => self.word.cmp(&other.word),
-                ord => ord,
-            }
-        )
     }
 }
