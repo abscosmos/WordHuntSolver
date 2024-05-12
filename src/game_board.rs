@@ -29,7 +29,7 @@ impl GameBoard {
             .collect()
     }
 
-    pub fn find_possible_sequences(&self, word_trie: &Trie<u8>) -> Vec<FoundWord> {
+    pub fn find_possible_sequences_with_duplicates(&self, word_trie: &Trie<u8>) -> Vec<FoundWord> {
         let mut found = Vec::new();
 
         for r in 0..4 {
@@ -39,6 +39,13 @@ impl GameBoard {
         }
 
         found
+    }
+
+    pub fn find_possible_sequences(&self, word_trie: &Trie<u8>) -> Vec<FoundWord> {
+        self.find_possible_sequences_with_duplicates(word_trie)
+            .into_iter()
+            .unique_by(|a| a.word.clone())
+            .collect()
     }
 
     fn find_possible_sequences_recurse(&self, row: usize, col: usize, mut word: String, mut visited: [[bool; 4]; 4], found: &mut Vec<FoundWord>, word_trie: &Trie<u8>, mut path: Vec<u8>) {
