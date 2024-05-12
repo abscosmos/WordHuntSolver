@@ -1,4 +1,6 @@
 use std::cmp::Ordering;
+use std::fmt;
+use itertools::Itertools;
 
 #[derive(Debug, Clone, PartialEq, Eq, Ord)]
 pub struct FoundWord {
@@ -26,5 +28,24 @@ impl PartialOrd for FoundWord {
                 ord => ord,
             }
         )
+    }
+}
+
+impl fmt::Display for FoundWord {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut board = ['*'; 16];
+        self.path.iter()
+            .enumerate()
+            .for_each(|(i, &n)| {
+                board[n as usize] = ((i + 1) as u8 + b'0') as char;
+            });
+
+        let board = board.iter()
+            .chunks(4)
+            .into_iter()
+            .map(|row| row.into_iter().join(" "))
+            .join("\n");
+
+        write!(f, "{}:\n{board}\n", self.word)
     }
 }
