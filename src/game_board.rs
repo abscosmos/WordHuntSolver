@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::fmt;
 use itertools::Itertools;
 use trie_rs::Trie;
@@ -77,7 +78,7 @@ impl fmt::Display for GameBoard {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Ord)]
 pub struct FoundWord {
     pub word: String,
     pub path: Vec<u8>
@@ -92,5 +93,16 @@ impl FoundWord {
                 .cloned()
                 .collect()
         }
+    }
+}
+
+impl PartialOrd for FoundWord {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(
+            match self.word.len().cmp(&other.word.len()) {
+                Ordering::Equal => self.word.cmp(&other.word),
+                ord => ord,
+            }
+        )
     }
 }

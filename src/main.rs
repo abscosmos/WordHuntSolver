@@ -17,7 +17,7 @@ fn main() {
     let words_trie = board.find_possible_sequences(&list.into_trie());
 
     words_trie.iter()
-        .sorted_by_key(|FoundWord {word, .. }| (word.len(), word))
+        .sorted()
         .rev()
         .take(5)
         .for_each(|w| println!("{w:?}"));
