@@ -13,10 +13,16 @@ fn main() {
             .lines()
     );
 
+    println!("[Enter \"new\" for a new board, and \"stop\" to stop]");
+
     'main: loop {
         let mut board= String::new();
         println!("Enter board as 16 continuous letters: ");
         io::stdin().read_line(&mut board).expect("Read input from stdin");
+
+        if board.trim() == "stop" {
+            break;
+        }
 
         let Some(board) = GameBoard::from_string(&board.trim()) else {
             continue;
@@ -29,6 +35,8 @@ fn main() {
                 .build()
         );
 
+        println!();
+
         for f in found.iter().sorted().rev() {
             println!("{f}");
 
@@ -36,7 +44,7 @@ fn main() {
             io::stdin().read_line(&mut input).unwrap();
 
             match input.trim() {
-                "new" => break,
+                "new" => { println!(); break; },
                 "stop" => break 'main,
                 _ => {},
             }
