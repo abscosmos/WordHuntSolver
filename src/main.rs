@@ -2,28 +2,45 @@ use std::io;
 use std::io::Write;
 use itertools::Itertools;
 use crate::game_board::GameBoard;
-use crate::word_list::WordList;
+use crate::word_list::WordListBuilder;
 
 mod game_board;
 mod word_list;
 mod found_word;
 
 fn main() {
-    let mut board= String::new();
+    let mut word_list = WordListBuilder::from_words(
+        include_str!("../dictionary/CollinsScrabbleWords.txt")
+            .lines()
+    );
 
-    println!("Enter board as 16 continuous letters: ");
-    io::stdin().read_line(&mut board).expect("Read input from stdin");
+    'main: loop {
+        let mut board= String::new();
+        println!("Enter board as 16 continuous letters: ");
+        io::stdin().read_line(&mut board).expect("Read input from stdin");
 
-    let board = GameBoard::from_string(&board.trim()).expect("Invalid board input");
+        let Some(board) = GameBoard::from_string(&board.trim()) else {
+            continue;
+        };
 
-    println!("{board}\n");
+        let found = board.find_possible_sequences(
+            &word_list
+                .clone()
+                .only_using_letters(&board.letters())
+                .build()
+        );
 
-    let mut list = WordList::load_from_file("dictionary/CollinsScrabbleWords.txt".as_ref()).unwrap();
-    list.retain_only_buildable(&board.letters());
-    let words_trie = board.find_possible_sequences(&list.into_trie());
+        for f in found.iter().sorted().rev() {
+            println!("{f}");
 
-    for w in words_trie.iter().sorted().rev() {
-        println!("{w}");
-        io::stdin().read_line(&mut String::new()).unwrap();
+            let mut input = String::new();
+            io::stdin().read_line(&mut input).unwrap();
+
+            match input.trim() {
+                "new" => break,
+                "stop" => break 'main,
+                _ => {},
+            }
+        }
     }
 }
