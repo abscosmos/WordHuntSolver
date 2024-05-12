@@ -3,44 +3,33 @@ use itertools::Itertools;
 use trie_rs::{Trie, TrieBuilder};
 
 #[derive(Clone)]
-pub struct WordList(HashSet<String>);
+pub struct WordListBuilder(HashSet<String>);
 
-impl WordList {
-    pub fn load_from_file(path: &std::path::Path) -> std::io::Result<Self> {
-        Ok(WordList(
-            std::fs::read_to_string(path)?
-                .lines()
-                .map(ToString::to_string)
-                .collect()
-        ))
+impl WordListBuilder {
+    pub fn from_words<T>(iterable: T) -> Self where T: IntoIterator, T::Item: Into<String> {
+        Self(iterable.into_iter().map(Into::into).collect())
     }
 
-    pub fn from_vec(words: Vec<String>) -> Self {
-        Self(words.into_iter().collect())
-    }
-
-    pub fn words(&self) -> &HashSet<String> {
-        &self.0
-    }
-
-    pub fn validate_words(&mut self) {
+    pub fn validate(mut self) -> Self {
         self.0
             .retain(|word| (3..=14).contains(&word.len()) && word.chars().all(|c| c.is_ascii_alphabetic()));
         self.0 = self.0
             .iter()
             .map(|w| w.to_ascii_lowercase())
             .collect();
+
+        self
     }
 
-    pub fn into_trie(self) -> Trie<u8> {
+    pub fn build(&self) -> WordList {
         let mut builder = TrieBuilder::new();
-        self.0.into_iter()
+        self.0.iter()
             .sorted()
             .for_each(|w| builder.push(w));
-        builder.build()
+        WordList(builder.build())
     }
 
-    pub fn retain_only_buildable(&mut self, letters: &Vec<char>) {
+    pub fn only_using_letters(mut self, letters: &Vec<char>) -> Self {
         let mut unique = letters.iter().unique().collect::<String>();
 
         self.0
@@ -62,5 +51,9 @@ impl WordList {
 
             true
         });
+
+        self
     }
 }
+
+pub struct WordList(pub Trie<u8>);

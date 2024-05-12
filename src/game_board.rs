@@ -1,7 +1,7 @@
 use std::fmt;
 use itertools::Itertools;
-use trie_rs::Trie;
 use crate::found_word::FoundWord;
+use crate::word_list::WordList;
 
 #[derive(Debug)]
 pub struct GameBoard([[char; 4]; 4]);
@@ -29,26 +29,26 @@ impl GameBoard {
             .collect()
     }
 
-    pub fn find_possible_sequences_with_duplicates(&self, word_trie: &Trie<u8>) -> Vec<FoundWord> {
+    pub fn find_possible_sequences_with_duplicates(&self, word_list: &WordList) -> Vec<FoundWord> {
         let mut found = Vec::new();
 
         for r in 0..4 {
             for c in 0..4 {
-                self.find_possible_sequences_recurse(r, c, String::new(), [[false; 4]; 4], &mut found, word_trie, Vec::new());
+                self.find_possible_sequences_recurse(r, c, String::new(), [[false; 4]; 4], &mut found, word_list, Vec::new());
             }
         }
 
         found
     }
 
-    pub fn find_possible_sequences(&self, word_trie: &Trie<u8>) -> Vec<FoundWord> {
-        self.find_possible_sequences_with_duplicates(word_trie)
+    pub fn find_possible_sequences(&self, word_list: &WordList) -> Vec<FoundWord> {
+        self.find_possible_sequences_with_duplicates(word_list)
             .into_iter()
             .unique_by(|a| a.word.clone())
             .collect()
     }
 
-    fn find_possible_sequences_recurse(&self, row: usize, col: usize, mut word: String, mut visited: [[bool; 4]; 4], found: &mut Vec<FoundWord>, word_trie: &Trie<u8>, mut path: Vec<u8>) {
+    fn find_possible_sequences_recurse(&self, row: usize, col: usize, mut word: String, mut visited: [[bool; 4]; 4], found: &mut Vec<FoundWord>, word_list: &WordList, mut path: Vec<u8>) {
         let valid_idx = 0..4;
 
         visited[row][col] = true;
@@ -61,16 +61,16 @@ impl GameBoard {
             .iter()
             .cartesian_product(move_set);
 
-        if word_trie.is_prefix(&word) {
+        if word_list.0.is_prefix(&word) {
             for (&y, x) in move_set {
                 let (c, r) = ((x + col as i8) as usize, (y + row as i8) as usize);
                 if valid_idx.contains(&c) && valid_idx.contains(&r) && !visited[r][c] {
-                    self.find_possible_sequences_recurse(r, c, word.clone(), visited, found, word_trie, path.clone());
+                    self.find_possible_sequences_recurse(r, c, word.clone(), visited, found, word_list, path.clone());
                 }
             }
         }
 
-        if word_trie.exact_match(&word) {
+        if word_list.0.exact_match(&word) {
             found.push(FoundWord { word: word.clone(), path });
         }
     }
