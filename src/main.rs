@@ -23,7 +23,7 @@ fn main() {
     let words_trie = board.find_possible_sequences(&list.into_trie());
 
     for w in words_trie.iter().sorted().rev() {
-        println!("{w}\n");
+        println!("{w}");
         io::stdin().read_line(&mut String::new()).unwrap();
     }
 }
