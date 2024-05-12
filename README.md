@@ -3,7 +3,7 @@ A lightweight and fast command-line solver for the iMessage GamePigeon Word Hunt
 
 ## Word Hunt?
 In Word Hunt, both players are given two identical 4x4 boards of letters, and must create as many words as possible within 90 seconds.
-Letters can be connected horizonally, vertially, or diagonally, and words have to be at least three letters long.
+Letters can be connected horizontally, vertically, or diagonally, and words have to be at least three letters long.
 A word's score is determined solely by its length, with longer words earning more points.
 The player with the most points at the end of the game wins. The solver doesn't currently support maps 2-4, but it should be simple to implement.
 
