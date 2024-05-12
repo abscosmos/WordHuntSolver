@@ -13,17 +13,15 @@ fn main() {
     println!("{board}");
 
     let mut list = WordList::load_from_file("dictionary/compiled_words.txt".as_ref()).unwrap();
-    list.retain_only_possible(&board.letters_distinct());
+    list.retain_only_buildable(&board.letters());
+    let words_trie = board.find_possible_sequences(&list.into_trie());
 
-    println!("Potential words: {}", list.words().len());
+    words_trie.iter()
+        .sorted_by_key(|w| (w.len(), *w))
+        .rev()
+        .for_each(|w| println!("{w}"));
 
-    let mut words = board.find_possible_sequences(&list.words());
-    let words_trie = board.find_possible_sequences_trie(&list.clone().into_trie());
+    println!("{}", words_trie.len());
 
-    println!("original: {}, trie: {}", words.len(), words_trie.len());
-
-    let same = words.iter()
-        .sorted().eq(words_trie.iter().sorted());
-
-    println!("Are both lists the same? {same}");
+    profile::test();
 }

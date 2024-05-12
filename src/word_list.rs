@@ -40,8 +40,27 @@ impl WordList {
         builder.build()
     }
 
-    pub fn retain_only_possible(&mut self, letters: &Vec<char>) {
+    pub fn retain_only_buildable(&mut self, letters: &Vec<char>) {
+        let mut unique = letters.iter().unique().collect::<String>();
+
         self.0
-            .retain(|word| word.chars().all(|c| letters.contains(&c)));
+            .retain(|word| word.chars().all(|c| unique.contains(c)));
+
+        let mut counts = [0; 26];
+
+        letters.iter()
+            .for_each(|&c| { counts[c as usize - b'a' as usize] += 1; });
+
+        self.0.retain(|word| {
+            let mut letters = counts;
+
+            for c in word.chars() {
+                let idx = c as usize - b'a' as usize;
+                if letters[idx] == 0 { return false; }
+                letters[idx] -= 1;
+            }
+
+            true
+        });
     }
 }
